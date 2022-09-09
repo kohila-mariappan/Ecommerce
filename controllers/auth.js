@@ -1,4 +1,5 @@
-const User = require('../models/userDb')
+const User = require('../models/userSchema')
+const Product = require('../models/productSchema')
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -86,12 +87,12 @@ const userLogin = async (req, res) => {
 
 const addProduct = async(req, res) =>{
     try{
-        const {name, description, price,user } = req.body;
+        const {productName, productDesc, productPrice,createdUser } = req.body;
         const product = await Product.create({
-            name,
-            description,
-            price,
-            user
+            productName,
+            productDesc,
+            productPrice,
+            createdUser
         });
         const productDetails = await product.save()
         res.status(201).json(productDetails);
@@ -105,6 +106,8 @@ const addProduct = async(req, res) =>{
 
 
 }
+
+
 
   
   

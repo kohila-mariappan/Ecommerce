@@ -25,7 +25,6 @@ app.get('/', function(req,res){
   })
 
  let authRoutes = require('./routes/auth.js')
-//  const userModel = require('./models/userDb')
 
 app.post('/register',authRoutes)
 app.post('/login',authRoutes)
