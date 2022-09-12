@@ -28,7 +28,9 @@ app.get('/', function(req,res){
 
 app.post('/register',authRoutes)
 app.post('/login',authRoutes)
-app.post('/add/product', authRoutes)
+app.post('/product/add', authRoutes)
+app.post('/category/add',authRoutes)
+app.get('/category/list',authRoutes)
 
 
 

@@ -5,8 +5,9 @@ const router = express.Router();
 
 router.post('/register', userControllers.userRegister);
 router.post('/login',userControllers.userLogin)
-router.post('/add/product',userControllers.addProduct)
-
+router.post('/product/add',userControllers.addProduct)
+router.post('/category/add',userControllers.addCategory)
+router.get('/category/list',userControllers.listCategory)
 // router.post('/login', userControllers.userLogin);
 // router.get('/me', checkAuth, userControllers.getMe);
 
@@ -17,26 +18,3 @@ module.exports = router
 
 
 
-// app.post('v1/registration', (req, res) => {
-//     controller.userRegistration(req, res)
-//         .then(function (finalResult) {
-
-//             console.log("Final response for /v1/registration ", finalResult);
-
-//             res.send(finalResult);
-//         })
-
-//         .catch(function (e) {
-//             console.log("Catch handler /v1/registration" + e);
-//             res.send(e.message);
-//         });
-
-// });
-//.post('/registration',controller.userRegistration)
-
-
-
-
-
-
-//module.exports = app

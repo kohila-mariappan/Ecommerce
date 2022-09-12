@@ -1,5 +1,6 @@
 const User = require('../models/userSchema')
 const Product = require('../models/productSchema')
+const Category = require('../models/productCategoryShema')
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -18,7 +19,10 @@ const userRegister = async (req, res) => {
             return res.status(409).send("User Already Exist. Please Login");
         }
         
-        encryptedPassword = await bcrypt.hash(password, 10);
+        const salt = await bcrypt.genSalt(12)
+        console.log('salt',salt)
+
+        encryptedPassword = await bcrypt.hash(password, salt);
         
         const user = await User.create({
             name,
@@ -26,7 +30,9 @@ const userRegister = async (req, res) => {
             password: encryptedPassword,
         });
         const userRegister = await user.save()
-        res.status(201).json(userRegister);
+        res.status(201).json({
+            message : "User Registered Successfully",
+            userRegister});
     } catch (err) {
         console.log(err);
         res.status(500).json({
@@ -37,6 +43,7 @@ const userRegister = async (req, res) => {
   
 const userLogin = async (req, res) => {
     try{
+        if(req.body && req.body.email && req.body.password){
         const{email,password} = req.body;
         console.log('user mail',email)
 
@@ -45,11 +52,11 @@ const userLogin = async (req, res) => {
 
         if (user.length < 1) {
             return res.status(401).json({
-                message: "Auth failed: Email not found probably",
+                message: "Auth failed: User not found,Please sign up",
             });
         }
-       
-        if (user && (await bcrypt.compare(password, user[0].password))){
+
+            if (user && (await bcrypt.compare(password, user[0].password))){
             const token = jwt.sign(
                 {
                     userId: user[0]._id,
@@ -63,7 +70,7 @@ const userLogin = async (req, res) => {
                 }
                 );
                 console.log(user[0])
-                return res.status(200).json({
+                 return res.status(200).json({
                     message: "Auth successful",
                     userDetails: {
                         userId: user[0]._id,
@@ -75,8 +82,14 @@ const userLogin = async (req, res) => {
                 });
             }
             res.status(401).json({
-                message: "Auth failed1",
+                message: "Auth failed: Incorrect email or pasword",
             });
+        }
+        else{
+            res.status(400).json({
+                message: "Enter mail and password",
+            });
+        }
     }
 		catch(err)  {
 			res.status(500).json({
@@ -87,16 +100,29 @@ const userLogin = async (req, res) => {
 
 const addProduct = async(req, res) =>{
     try{
-        const {productName, productDesc, productPrice,createdUser } = req.body;
-        const product = await Product.create({
-            productName,
-            productDesc,
-            productPrice,
-            createdUser
+        const {productName, productDesc, productPrice,createdUser,categoryId} = req.body;
+        findUser = await User.findOne({name : createdUser})
+        findCategory = await Category.findOne({categoryId : categoryId})
+        console.log('finduser',findCategory)
+        if((findUser&&findCategory)  != null){
+            const product = await Product.create({
+                productName,
+                productDesc,
+                productPrice,
+                createdUser,
+                userId : findUser._id,
+                categoryId : findCategory.categoryId,
+                categoryName :findCategory.categoryName
+            });
+            console.log(product)
+            const productDetails = await product.save()
+            res.status(201).json(productDetails);
+        }
+         else{
+        res.status(401).json({
+            message: "invalid username or category name",
         });
-        const productDetails = await product.save()
-        res.status(201).json(productDetails);
-
+    }
     }catch(err){
         console.log(err);
         res.status(500).json({
@@ -107,6 +133,51 @@ const addProduct = async(req, res) =>{
 
 }
 
+let addCategory = async (req,res) =>{
+    try{
+        if(req.body && req.body.categoryName && req.body.categoryId){
+            const {categoryName,categoryId} = req.body
+            const category = await Category.create({
+                categoryName,
+                categoryId
+            });
+            const newCategory = await category.save()
+            console.log('new category',newCategory)
+            res.status(201).json({
+                message :" add a new category successfully",
+                newCategory
+            });
+        }
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({
+            error: err,
+        });
+    }
+
+    // console.log('poduct',productName)
+    // let findCategory = await Category.findOne({categoryName : productName})
+    // console.log('find category',findCategory)
+    // return findCategory
+}
+let listCategory = async (req,res)=>{
+    let categoryList = await Category.find()
+    console.log('category list',categoryList)
+    res.send(categoryList)
+}
+
+// const categoryNames = {
+//         "electronics" : 
+//         {"mobile": ["samsung","redmi"],"laptop" : ["Dell","mac"],"headphone" : ["boat","redmi"]},
+   
+//     "books" :{"children" : ["stories","novels"],"Acadamic" : ["upsc","group1"]},
+    
+//     "kitchan & home" : 
+//         {"kitchen & appliances" : [ "cookware","dinner ware"],"home textiles" : ["curtains","carpet"]}
+//     }
+
+//console.log("welcome",categoryNames.books.children)
 
 
   
@@ -120,4 +191,6 @@ const addProduct = async(req, res) =>{
     userRegister,
     userLogin,
     addProduct,
+    addCategory,
+    listCategory,
   }
