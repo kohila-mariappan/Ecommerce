@@ -3,6 +3,7 @@ const Product = require('../models/productSchema')
 const Category = require('../models/productCategoryShema')
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("../utils/sendEmail");
 
 const userRegister = async (req, res) => {
 
@@ -143,7 +144,7 @@ let addCategory = async (req,res) =>{
             });
             const newCategory = await category.save()
             console.log('new category',newCategory)
-            res.status(201).json({
+            res.status(200).json({
                 message :" add a new category successfully",
                 newCategory
             });
@@ -155,18 +156,40 @@ let addCategory = async (req,res) =>{
             error: err,
         });
     }
-
-    // console.log('poduct',productName)
-    // let findCategory = await Category.findOne({categoryName : productName})
-    // console.log('find category',findCategory)
-    // return findCategory
 }
+
 let listCategory = async (req,res)=>{
     let categoryList = await Category.find()
     console.log('category list',categoryList)
     res.send(categoryList)
 }
 
+let passwordlink = async (req,res) =>{
+    try {
+        const {email} = req.body
+
+        const user = await User.findOne({ email: email });
+            if (!user){
+                res.status(400).json({
+                    message : "user with given email doesn't exist",
+                    user
+                })
+                }
+                else{
+                const link = `${process.env.BASE_URL}/password-reset/${user._id}`;
+                console.log('link',link)
+                await sendEmail(user.email, "Password-reset", link);
+                res.send("password reset link sent to your email account");
+            }
+    
+         } catch (error) {
+            res.send("An error occured");
+            console.log(error);
+        }
+    }
+
+
+    
 // const categoryNames = {
 //         "electronics" : 
 //         {"mobile": ["samsung","redmi"],"laptop" : ["Dell","mac"],"headphone" : ["boat","redmi"]},
@@ -193,4 +216,5 @@ let listCategory = async (req,res)=>{
     addProduct,
     addCategory,
     listCategory,
+    passwordlink,
   }

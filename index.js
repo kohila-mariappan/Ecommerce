@@ -31,6 +31,7 @@ app.post('/login',authRoutes)
 app.post('/product/add', authRoutes)
 app.post('/category/add',authRoutes)
 app.get('/category/list',authRoutes)
+app.post('/password/reset',authRoutes)
 
 
 

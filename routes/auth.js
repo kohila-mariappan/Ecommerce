@@ -8,6 +8,7 @@ router.post('/login',userControllers.userLogin)
 router.post('/product/add',userControllers.addProduct)
 router.post('/category/add',userControllers.addCategory)
 router.get('/category/list',userControllers.listCategory)
+router.post('/password/reset',userControllers.passwordlink)
 // router.post('/login', userControllers.userLogin);
 // router.get('/me', checkAuth, userControllers.getMe);
 
