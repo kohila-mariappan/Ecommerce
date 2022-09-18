@@ -4,135 +4,13 @@ const Category = require('../models/productCategoryShema')
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail");
-
-const userRegister = async (req, res) => {
-
-    try {
-        const {name, email, password } = req.body;
-        
-        if (!(email && password && name )) {
-            res.status(400).send("All input is required");
-        }
-        
-        const oldUser = await User.findOne({ email });
-        
-        if (oldUser) {
-            return res.status(409).send("User Already Exist. Please Login");
-        }
-        
-        const salt = await bcrypt.genSalt(12)
-        console.log('salt',salt)
-
-        encryptedPassword = await bcrypt.hash(password, salt);
-        
-        const user = await User.create({
-            name,
-            email: email.toLowerCase(), 
-            password: encryptedPassword,
-        });
-        const userRegister = await user.save()
-        res.status(201).json({
-            message : "User Registered Successfully",
-            userRegister});
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({
-            error: err,
-        });
-    }
-};
-  
-const userLogin = async (req, res) => {
-    try{
-        if(req.body && req.body.email && req.body.password){
-        const{email,password} = req.body;
-        console.log('user mail',email)
-
-        const user = await User.find({ email:email })
-        console.log(user)
-
-        if (user.length < 1) {
-            return res.status(401).json({
-                message: "Auth failed: User not found,Please sign up",
-            });
-        }
-
-            if (user && (await bcrypt.compare(password, user[0].password))){
-            const token = jwt.sign(
-                {
-                    userId: user[0]._id,
-                    email: user[0].email,
-                    name: user[0].name,
-                    phone_number: user[0].phone_number,
-                },
-                process.env.JWT_SECRET,
-                {
-                    expiresIn: "3h",
-                }
-                );
-                console.log(user[0])
-                 return res.status(200).json({
-                    message: "Auth successful",
-                    userDetails: {
-                        userId: user[0]._id,
-                        name: user[0].name,
-                        email: user[0].email,
-                        phone_number: user[0].phone_number,
-                    },
-                    token: token,
-                });
-            }
-            res.status(401).json({
-                message: "Auth failed: Incorrect email or pasword",
-            });
-        }
-        else{
-            res.status(400).json({
-                message: "Enter mail and password",
-            });
-        }
-    }
-		catch(err)  {
-			res.status(500).json({
-				error: err,
-			});
-		};
-}
-
-const addProduct = async(req, res) =>{
-    try{
-        const {productName, productDesc, productPrice,createdUser,categoryId} = req.body;
-        findUser = await User.findOne({name : createdUser})
-        findCategory = await Category.findOne({categoryId : categoryId})
-        console.log('finduser',findCategory)
-        if((findUser&&findCategory)  != null){
-            const product = await Product.create({
-                productName,
-                productDesc,
-                productPrice,
-                createdUser,
-                userId : findUser._id,
-                categoryId : findCategory.categoryId,
-                categoryName :findCategory.categoryName
-            });
-            console.log(product)
-            const productDetails = await product.save()
-            res.status(201).json(productDetails);
-        }
-         else{
-        res.status(401).json({
-            message: "invalid username or category name",
-        });
-    }
-    }catch(err){
-        console.log(err);
-        res.status(500).json({
-            error: err,
-        });
-    }
+ const fs = require("fs");
+// const csv = require("fast-csv");
+// const CsvParser = require("json2csv").Parser;
+var csvFileSchema = require('../models/csvFileSchema')
+var csv = require('csvtojson')
 
 
-}
 
 let addCategory = async (req,res) =>{
     try{
@@ -149,6 +27,9 @@ let addCategory = async (req,res) =>{
                 newCategory
             });
         }
+        else{
+
+        }
     }
     catch(err){
         console.log(err);
@@ -161,32 +42,56 @@ let addCategory = async (req,res) =>{
 let listCategory = async (req,res)=>{
     let categoryList = await Category.find()
     console.log('category list',categoryList)
-    res.send(categoryList)
+    res.send(categoryList) //send json
 }
 
-let passwordlink = async (req,res) =>{
-    try {
-        const {email} = req.body
 
-        const user = await User.findOne({ email: email });
-            if (!user){
-                res.status(400).json({
-                    message : "user with given email doesn't exist",
-                    user
-                })
-                }
-                else{
-                const link = `${process.env.BASE_URL}/password-reset/${user._id}`;
-                console.log('link',link)
-                await sendEmail(user.email, "Password-reset", link);
-                res.send("password reset link sent to your email account");
-            }
-    
-         } catch (error) {
-            res.send("An error occured");
-            console.log(error);
-        }
-    }
+
+
+
+
+// const uploadCsv = async (req, res) => {
+//     try {
+//       if (req.file == undefined) {
+//         return res.status(400).send("Please upload a CSV file!");
+//       }
+  
+//       let tutorials = [];
+//       let path = __basedir + "/resources/static/assets/uploads/" + req.file.filename;
+  
+//       fs.createReadStream(path)
+//         .pipe(csv.parse({ headers: true }))
+//         .on("error", (error) => {
+//           throw error.message;
+//         })
+//         .on("data", (row) => {
+//           tutorials.push(row);
+//         })
+//         .on("end", () => {
+//           Tutorial.bulkCreate(tutorials)
+//             .then(() => {
+//               res.status(200).send({
+//                 message:
+//                   "Uploaded the file successfully: " + req.file.originalname,
+//               });
+//             })
+//             .catch((error) => {
+//               res.status(500).send({
+//                 message: "Fail to import data into database!",
+//                 error: error.message,
+//               });
+//             });
+//         });
+//     } catch (error) {
+//       console.log(error);
+//       res.status(500).send({
+//         message: "Could not upload the file: " + req.file.originalname,
+//       });
+//     }
+//   };
+  
+  
+
 
 
     
@@ -211,10 +116,8 @@ let passwordlink = async (req,res) =>{
 
 
   module.exports = {
-    userRegister,
-    userLogin,
-    addProduct,
+   
     addCategory,
     listCategory,
-    passwordlink,
+   
   }

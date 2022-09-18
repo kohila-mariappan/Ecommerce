@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
       required: true,
       min: 8
     },
+    token: {
+      type:String,
+      unique : true
+    }
     // phone :{
     //     type : String,
     //     required : true,
