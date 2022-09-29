@@ -1,22 +1,41 @@
 const jwt = require("jsonwebtoken");
+const statusCode = require('../utils/statusCode')
 
-const config = process.env;
+//const config = process.env;
 
 const verifyToken = (req, res, next) => {
-  const token =
-    req.body.token || req.query.token || req.headers["x-access-token"];
-
+  try{
+    const authtoken = req.headers["authorization"]
+  //console.log('authtoken',authtoken)
+  const bearerToken = authtoken.split(' ')
+  const token = bearerToken[1]
+ 
   if (!token) {
-    return res.status(403).send("A token is required for authentication");
+    let message = "A token is required for authentication"
+    statusCode.badRequestResponse(res,message)
   }
   try {
-    const decoded = jwt.verify(token, config.TOKEN_KEY);
-    req.user = decoded;
-    req.user._id = token
-  } catch (err) {
-    return res.status(401).send("Invalid Token");
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET,);
+    //console.log('decoded',decoded)
+    const userId = decodedToken.userId;
+    
+    if(req.body.userId && req.body.userId !== userId){
+      throw "invalid user ID"
+    }
+    else{
+      next();
+    }
+    // let message = "Token Verified"
+     //statusCode.successResponseWithData(res,message,req.user)
+  } catch (err) { 
+    statusCode.authorisationErrorReponse(res,err)
   }
-  return next();
+
+  }catch(err){
+    let message = "invalid token"
+    statusCode.errorResponse(res,message)
+  }
+  
 };
 
-module.exports = verifyToken;
+module.exports={verifyToken}

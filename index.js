@@ -6,7 +6,7 @@ console.log('start the project')
 const path = require('path')
 const db = require("./config/db")
 db.connect();
-const errorCode = require("./utils/errorCodes")
+const statusCode = require('./utils/statusCode')
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -20,14 +20,19 @@ app.get('/', function(req,res){
     res.send('Hello world')
   })
 
-const adminRoutes = require('./routes/adminRoutes')
-const userRoutes = require('./routes/userRoutes')
-const productRoutes = require('./routes/productRoutes')
+const routes = require('./routes/index')
+app.use('/',routes)
+
+// const adminRoutes = require('./routes/adminRoutes')
+// const userRoutes = require('./routes/userRoutes')
+// const productRoutes = require('./routes/productRoutes')
+// const productCategoryRoutes = require('./routes/productCategoryRoutes')
 
 
-app.use('/admin',adminRoutes)
-app.use('/user',userRoutes)
-app.use('/product',productRoutes)
+// app.use('/admin',adminRoutes)
+// app.use('/user',userRoutes)
+// app.use('/product',productRoutes)
+// app.use('/productCategory',productCategoryRoutes)
 
 // app.post('/category/add',authRoutes)
 // app.get('/category/list',authRoutes)

@@ -16,32 +16,32 @@ const userSchema = new mongoose.Schema({
     token: {
       type:String,
       unique : true
+    },
+    phone :{
+        type : String,
+        required : true,
+        unique : true
+    },
+    city : {
+        type: String,
+      required: true,
+      max: 200
+    },
+    state : {
+        type: String,
+      required: true,
+      max: 200
+    },
+    country : {
+        type: String,
+      required: true,
+      max: 200
+    },
+    address : {
+        type: String,
+      required: true,
+      max: 300
     }
-    // phone :{
-    //     type : String,
-    //     required : true,
-    //     unique : true
-    // },
-    // city : {
-    //     type: String,
-    //   required: true,
-    //   max: 200
-    // },
-    // state : {
-    //     type: String,
-    //   required: true,
-    //   max: 200
-    // },
-    // country : {
-    //     type: String,
-    //   required: true,
-    //   max: 200
-    // },
-    // address : {
-    //     type: String,
-    //   required: true,
-    //   max: 300
-    // }
   },{timestamps: true}
   )
 

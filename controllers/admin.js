@@ -2,6 +2,8 @@ const Admin = require('../models/adminSchema')
 const bcrypt = require("bcrypt");
 const sendEmail = require("../utils/sendEmail");
 const statusCode = require ('../utils/statusCode')
+const tokenSchema = require('../models/tokenSchema')
+
 const adminRegister = async (req, res) => {
 
     try {
@@ -22,12 +24,13 @@ const adminRegister = async (req, res) => {
         const salt = await bcrypt.genSalt(12)
         console.log('salt',salt)
 
-        encryptedPassword = await bcrypt.hash(password, salt);
+        let encryptedPassword = await bcrypt.hash(password, salt);
         
         const admin = await Admin.create({
             name,
             email: email.toLowerCase(), 
-            password: encryptedPassword,
+            password: encryptedPassword
+
         });
         const adminRegister = await admin.save()
         let message = "Admin Registered Successfully"
@@ -95,46 +98,49 @@ let passwordlink = async (req,res) =>{
     try {
         const {email} = req.body
 
-        const user = await User.findOne({ email: email });
-            if (!user){
-                let message = "user with given email doesn't exist" + user
-                statusCode.badRequestResponse(res,message)
-                }
-                else{
-                const link = `${process.env.BASE_URL}/password-reset/${user._id}`;
-                console.log('link',link)
-                await sendEmail(user.email, "Password-reset", link);
-                let message = "password reset link sent to your email account";
-                statusCode.successResponse(res,message)
+        const adminUser = await Admin.findOne({ email: email });
+        if (!adminUser){
+            let message = " user with given email doesn't exist /n " + adminUser
+            console.log(message,"message")
+            statusCode.badRequestResponse(res,message)
+        }
+        else{
+            const link = `${process.env.BASE_URL}/${user._id}`;
+            console.log('link',link)
+            await sendEmail(adminUser.email, "Password-reset", link);
+            let message = "password reset link sent to your email account";
+            statusCode.successResponse(res,message)
             }
     
          } catch (error) {
-            statusCode.errorResponse(res,error)
+            let message = " Enter proper mail id"
+            statusCode.errorResponse(res,message)
         }
 }
 let passwordReset = async (req, res) => {
     try {
-        const {userId,newPassword} = req.body
+        console.log(req.body)
+        const {adminId,newPassword} = req.body
 
-        const user = await User.findById(userId);
-        if (!user)
-        {
+        const adminUser = await Admin.findById(adminId);
+        console.log('user',adminUser)
+        if (!adminUser) {
             let message = "invalid link or expired"
             statusCode.badRequestResponse(res,message)
         }
         else{
-
-        const salt = await bcrypt.genSalt(12)
-        console.log('salt',salt)
-
-        encryptedPassword = await bcrypt.hash(newPassword, salt);
-        user.password = encryptedPassword;
-        await user.save();
-        let message = "password reset sucessfully."
-        statusCode.successResponse(res,message)
+            const salt = await bcrypt.genSalt(12)
+            console.log('salt',salt)
+            const encryptedPassword = await bcrypt.hash(newPassword, salt);
+            console.log('encryptedPassword',encryptedPassword)
+            adminUser.password = encryptedPassword;
+            newPwd = await adminUser.save()
+            let message = "password reset sucessfully."
+            statusCode.successResponse(res,message);
         }
     } catch (error) {
-        statusCode.errorResponse(res,error)
+        let message = "user id is not valid"
+        statusCode.errorResponse(res,message)
     }
 };
 

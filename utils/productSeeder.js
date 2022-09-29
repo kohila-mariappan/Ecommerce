@@ -1,38 +1,44 @@
 const mongoose = require('mongoose')
-const product = require('../models/productSchema')
+const productType = require('../models/productTypeSchema')
 
 let seederProducts = [
     {
-        productName : "novel",
-        productPrice: 150,
-        categoryName:"books" ,
-        categoryId  : "SKU3"
+        productType : "Mobile" [
+            {
+
+            }
+        ],
+        productType : "Laptop"[
+                    {
+                        brandtName :"Dell"[
+                            {
+                                productName : ['inspiron','XPS 13']
+
+                            }
+                        ],
+                        brandName:"lenovo"[
+                            {
+                                productName:['Pavilion','Ryzen']
+                            }
+                        ]
+                    }
+                ]
+            
+        ,
+        productType : [
+                   
+
+                ],
+                productType : [
+                    
+                ]
+            
+        
     },
-    {
-        productName : "Mobile",
-        productPrice: 15000,
-        categoryName:"electronics",
-        categoryId  : "SKU1"
-    },
-    {
-        productName : "laptop",
-        productPrice: 150000,
-        categoryName:"electronics",
-        categoryId  : "SKU1"
-    },
-    {
-        productName : "dinnerware",
-        productPrice: 1500,
-        categoryName:"kitchen things",
-        categoryId  : "SKU2"
-    },
-    {
-        productName : "cookware",
-        productPrice: 1500,
-        categoryName:"kitchen things",
-        categoryId  : "SKU2"
-    }
 ]
+
+
+    
 
 const seedDb = async ()=>{
     await product.deleteMany({});

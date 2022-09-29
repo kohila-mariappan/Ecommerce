@@ -31,6 +31,11 @@ const userRegister = async (req, res) => {
             name,
             email: email.toLowerCase(), 
             password: encryptedPassword,
+            phone :req.body.phone,
+            city : req.body.city,
+            state : req.body.state,
+            country:req.body.country,
+            address :req.body.address
         });
         const userRegister = await user.save()
         let message = "Successfully Registered"
@@ -44,10 +49,10 @@ const userRegister = async (req, res) => {
 const userLogin = async (req, res) => {
     try{
         const{email,password} = req.body;
-        console.log('user mail',email)
+        //console.log('user mail',email)
 
         const user = await User.find({ email:email })
-        console.log(user)
+        //console.log(user)
 
         if (user.length < 1) {
             let message = "Auth failed: User not found,Please sign up"
@@ -55,25 +60,24 @@ const userLogin = async (req, res) => {
         }
 
             if (user && (await bcrypt.compare(password, user[0].password))){
+                //token generation
             const token = jwt.sign(
                 {
                     userId: user[0]._id,
-                    email: user[0].email,
-                    name: user[0].name,
-                    phone_number: user[0].phone_number,
                 },
                 process.env.JWT_SECRET,
                 {
                     expiresIn: "3h",
                 }
                 );
+                console.log('token',token)
                 const userToken = await tokenSchema.create({
                     userId : user._id,
                     token : token
                     
                 });
                 const userTokens = await userToken.save()
-                console.log('user',userTokens)
+                //console.log('user',userTokens)
                 let data = {
                     userDetails: {
                     userId: user[0]._id,
@@ -84,7 +88,7 @@ const userLogin = async (req, res) => {
                 token: token,
             }
             let mesage  = "Successfully logged in"
-            console.log('data',data)
+            //console.log('data',data)
             statusCode.successResponseWithData(res,mesage,data)
             }
            
@@ -102,12 +106,14 @@ let passwordlink = async (req,res) =>{
         const {email} = req.body
 
         const user = await User.findOne({ email: email });
+        console.log(user,'pwd reset')
         if (!user){
             let message = " user with given email doesn't exist /n " + user
+            console.log(message,"message")
             statusCode.badRequestResponse(res,message)
         }
         else{
-            const link = `${process.env.BASE_URL}/password-reset/${user._id}`;
+            const link = `${process.env.BASE_URL}/${user._id}`;
             console.log('link',link)
             await sendEmail(user.email, "Password-reset", link);
             let message = "password reset link sent to your email account";
@@ -121,25 +127,28 @@ let passwordlink = async (req,res) =>{
 }
 let passwordReset = async (req, res) => {
     try {
+        console.log(req.body)
         const {userId,newPassword} = req.body
 
         const user = await User.findById(userId);
+        console.log('user',user)
         if (!user) {
             let message = "invalid link or expired"
             statusCode.badRequestResponse(res,message)
         }
-
-        const salt = await bcrypt.genSalt(12)
-        console.log('salt',salt)
-
-        encryptedPassword = await bcrypt.hash(newPassword, salt);
-        user.password = encryptedPassword;
-        await user.save();
-        let message = "password reset sucessfully."
-        statusCode.successResponse(res,message);
+        else{
+            const salt = await bcrypt.genSalt(12)
+            console.log('salt',salt)
+            const encryptedPassword = await bcrypt.hash(newPassword, salt);
+            console.log('encryptedPassword',encryptedPassword)
+            user.password = encryptedPassword;
+            newPwd = await user.save()
+            let message = "password reset sucessfully."
+            statusCode.successResponse(res,message);
+        }
     } catch (error) {
         let message = "user id is not valid"
-        statusCode.errorResponse(re,message)
+        statusCode.errorResponse(res,message)
     }
 };
 

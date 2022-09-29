@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const admin = require('../controllers/admin')
-const checkAuth = require('../middlewares/checkAuth');
+const validation = require('../middlewares/checkAuth');
+
 
 
 router.post('/signUp',admin.adminRegister)
 router.post('/login',admin.adminLogin)
-router.post('/password/reset',admin.passwordlink)
-router.post("password-reset/userId",admin.passwordReset)
+router.post('/password/reset',[validation.verifyToken],admin.passwordlink)
+router.post("password-reset/userId",[validation.verifyToken],admin.passwordReset)
 
 
 

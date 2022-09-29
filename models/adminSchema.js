@@ -4,17 +4,48 @@ const adminSchema = new mongoose.Schema({
       type: String,
       required: true,
       max: 200
-    },  email: {
+    },  
+    email: {
       type: String,
       required: true,
       unique: true,
-    },  password: {
+    },  
+    password: {
       type: String,
       required: true,
       min: 8
     },
-},{timestamps: true}
-)
+    token: {
+      type:String,
+      //unique : true
+    },
+    phone :{
+        type : String,
+        //required : true,
+        unique : true
+    },
+    city : {
+        type: String,
+      //required: true,
+      max: 200
+    },
+    state : {
+        type: String,
+      //required: true,
+      max: 200
+    },
+    country : {
+        type: String,
+      //required: true,
+      max: 200
+    },
+    address : {
+        type: String,
+      //required: true,
+      max: 300
+    }
+  },{timestamps: true}
+  )
 
 
-module.exports = mongoose.model('Admin',adminSchema)
+  module.exports = mongoose.model('Admin',adminSchema)

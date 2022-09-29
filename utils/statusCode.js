@@ -37,7 +37,7 @@ let authorisationErrorReponse = (res,msg) =>{
     return res.status(401).json(data);
     
 }
-let badRequestResponse = (res,mg)=>{
+let badRequestResponse = (res,msg)=>{
     let data = {
         status : 0,
         message : msg

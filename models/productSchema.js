@@ -5,7 +5,7 @@ const  productSchema = new mongoose.Schema({
       required: true,
       max: 200
     },                 
-    productDesc: {
+    productBrand: {
       type: String,
       //required: true,
     },
@@ -13,16 +13,21 @@ const  productSchema = new mongoose.Schema({
       type: Number,
       required: true,
     },
-    createdUser:{ 
+    productType:{ 
       type: String,
       //required: true,
     },
-    categoryId :{
+    categoryName :{
       type : String,
       required : true,
     },
-    categoryName : {
-      type : String
+    categoryId :{
+      type:String
     }
+    
   },{timestamps: true});
+
+
+
+
 module.exports = mongoose.model('Product',productSchema)
