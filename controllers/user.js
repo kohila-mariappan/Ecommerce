@@ -15,14 +15,15 @@ const userRegister = async (req, res) => {
             statusCode.badRequestResponse(res,message)
         }
         
+        
         const oldUser = await User.findOne({ email });
         
         if (oldUser) {
             let message = "User Already Exist. Please Login";
             statusCode.dataResponse(res,message)
         }
-        
-        const salt = await bcrypt.genSalt(12)
+        else{
+            const salt = await bcrypt.genSalt(12)
         console.log('salt',salt)
 
         encryptedPassword = await bcrypt.hash(password, salt);
@@ -39,7 +40,11 @@ const userRegister = async (req, res) => {
         });
         const userRegister = await user.save()
         let message = "Successfully Registered"
-        statusCode.successResponseWithData(res,message,userRegister)
+        statusCode.successResponse(res,message)
+
+        }
+        
+        
     } catch (err) {
         let message = err
         statusCode.errorResponse(res,message)
@@ -49,16 +54,14 @@ const userRegister = async (req, res) => {
 const userLogin = async (req, res) => {
     try{
         const{email,password} = req.body;
-        //console.log('user mail',email)
 
         const user = await User.find({ email:email })
-        //console.log(user)
 
         if (user.length < 1) {
             let message = "Auth failed: User not found,Please sign up"
             statusCode.authorisationErrorReponse(res,message)
         }
-
+        else{
             if (user && (await bcrypt.compare(password, user[0].password))){
                 //token generation
             const token = jwt.sign(
@@ -91,13 +94,15 @@ const userLogin = async (req, res) => {
             //console.log('data',data)
             statusCode.successResponseWithData(res,mesage,data)
             }
-           
-            let message = "Auth failed: Incorrect email or pasword";
-            statusCode.authorisationErrorReponse(res,message)
+            else{
+                let message = 'username or password was incorrect'
+                statusCode.authorisationErrorReponse(res,message)
+            }
+        }
        
     }
 		catch(err)  {
-			let message = err
+			let message = 'Auth failed: Incorrect email or pasword'
             statusCode.errorResponse(res,message)
 		};
 }

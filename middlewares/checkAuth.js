@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 const statusCode = require('../utils/statusCode')
 
-//const config = process.env;
 
 const verifyToken = (req, res, next) => {
   try{
@@ -28,12 +27,13 @@ const verifyToken = (req, res, next) => {
     // let message = "Token Verified"
      //statusCode.successResponseWithData(res,message,req.user)
   } catch (err) { 
+    let message = 'invalid token '
     statusCode.authorisationErrorReponse(res,err)
   }
 
   }catch(err){
     let message = "invalid token"
-    statusCode.errorResponse(res,message)
+    statusCode.errorResponse(res,err)
   }
   
 };

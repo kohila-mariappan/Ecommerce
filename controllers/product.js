@@ -10,7 +10,7 @@ const addProduct = async(req, res) =>{
         //findUser = await User.findOne({name : createdUser})
         findCategory = await Category.findOne({categoryName : categoryName})
         console.log('finduser',findCategory)
-        if((findCategory)  != null){
+        if((findCategory)  != null){          
             const product = await Product.create({
                 productName,
                 productBrand,
@@ -31,7 +31,7 @@ const addProduct = async(req, res) =>{
     }
     }catch(err){
       let message = "enter poduct name and details"
-        statusCode.errorResponse(res,err)
+        statusCode.errorResponse(res,message)
     }
 }
 
@@ -128,6 +128,10 @@ let viewProduct = async (req,res) =>{
   
 
 }
+
+
+
+
 
 
 

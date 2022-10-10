@@ -14,30 +14,36 @@ const adminRegister = async (req, res) => {
             statusCode.badRequestResponse(res,message)
         }
         
-        const oldAdmin = await Admin.findOne({ email });
+        const oldAdminUser = await Admin.findOne({ email });
         
-        if (oldAdmin) {
-            let message = "User Already Exist. Please Login"
+        if (oldAdminUser) {
+            let message = "User Already Exist. Please Login";
             statusCode.dataResponse(res,message)
         }
-        
-        const salt = await bcrypt.genSalt(12)
-        console.log('salt',salt)
+        else{
+            const salt = await bcrypt.genSalt(12)
 
-        let encryptedPassword = await bcrypt.hash(password, salt);
+            let encryptedPassword = await bcrypt.hash(password, salt);
         
-        const admin = await Admin.create({
+        const adminUser = await Admin.create({
             name,
             email: email.toLowerCase(), 
-            password: encryptedPassword
-
+            password: encryptedPassword,
+            phone :req.body.phone,
+            city : req.body.city,
+            state : req.body.state,
+            country:req.body.country,
+            address :req.body.address
         });
-        const adminRegister = await admin.save()
-        let message = "Admin Registered Successfully"
-        statusCode.successResponse(res,message,adminRegister)
-        } catch (err) {
-        console.log(err);
-        let message = "Error Message";
+        await adminUser.save()
+        let message = "Successfully Registered"
+        statusCode.successResponse(res,message)
+
+        }
+        
+        
+    } catch (err) {
+        let message = 'invalid details'
         statusCode.errorResponse(res,message)
     }
 };
@@ -45,52 +51,56 @@ const adminRegister = async (req, res) => {
 const adminLogin = async (req, res) => {
     try{
         const{email,password} = req.body;
-        console.log('user mail',email)
 
-        const admin = await Admin.find({ email:email })
-        console.log(admin)
+        const adminUser = await Admin.find({ email:email })
 
-        if (admin.length < 1) {
-            let message = "Auth failed: User not found,Please sign up";
+        if (adminUser.length < 1) {
+            let message = "Auth failed: User not found,Please sign up"
             statusCode.authorisationErrorReponse(res,message)
         }
-
-            if (admin && (await bcrypt.compare(password, admin[0].password))){
+        else{
+            if (adminUser && (await bcrypt.compare(password, adminUser[0].password))){
+                //token generation
             const token = jwt.sign(
                 {
-                    adminId: admin[0]._id,
-                    email: admin[0].email,
-                    name: admin[0].name,
-                    phone_number: admin[0].phone_number,
+                    userId: adminUser[0]._id,
                 },
                 process.env.JWT_SECRET,
                 {
                     expiresIn: "3h",
                 }
                 );
-                console.log(user[0])
-                let message =  "Admin Auth successful"
-                let adminData ={
-                    adminDetails: {
-                        adminId: admin[0]._id,
-                        name: admin[0].name,
-                        email: admin[0].email,
-                        phone_number: admin[0].phone_number,
-                    },
-                    token: token
-                }  
-                statusCode.successResponseWithData(res,message,adminData) 
+                console.log('token',token)
+                const userToken = await tokenSchema.create({
+                    userId : user._id,
+                    token : token
+                    
+                });
+                await userToken.save()
+                //console.log('user',userTokens)
+                let data = {
+                    userDetails: {
+                    userId: user[0]._id,
+                    name: user[0].name,
+                    email: user[0].email,
+                    phone_number: user[0].phone_number
+                },
+                token: token,
             }
-           else{
-            let message = "Auth failed: Incorrect email or pasword"
-            statusCode.authorisationErrorReponse(re,message)
-
-           }
-            
+            let mesage  = "Successfully logged in"
+            //console.log('data',data)
+            statusCode.successResponseWithData(res,mesage,data)
+            }
+            else{
+                let message = 'username or password was incorrect'
+                statusCode.authorisationErrorReponse(res,message)
+            }
+        }
+       
     }
 		catch(err)  {
-            let message = "Error Message "
-			statusCode.errorResponse(res,message)
+			let message = 'Auth failed: Incorrect email or pasword'
+            statusCode.errorResponse(res,message)
 		};
 }
 

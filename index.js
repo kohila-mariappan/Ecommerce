@@ -5,8 +5,8 @@ let bodyParser = require('body-parser')
 console.log('start the project')
 const path = require('path')
 const db = require("./config/db")
-db.connect();
 const statusCode = require('./utils/statusCode')
+db.connect();
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
