@@ -25,8 +25,8 @@ let addCategory = async (req,res) =>{
 }
 
 let listCategory = async (req,res)=>{
-    let pageNo = parseInt(req.query.pageNo)
-    let size = parseInt(req.query.size)  
+    let pageNo = 1
+    let size = 10  
       Category
           .find({})
           .skip(size * (pageNo - 1))
@@ -37,7 +37,7 @@ let listCategory = async (req,res)=>{
                   //else{
                     let data =  {
                       category: category,
-                      current: size,
+                      //current: size,
                       pages: Math.ceil(count / pageNo)
                   }
                   let message = "category list"

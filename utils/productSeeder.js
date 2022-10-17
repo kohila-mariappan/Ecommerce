@@ -9,7 +9,7 @@ const db = require("../config/db")
 let seederProducts = [
     {
         productTypeName : "Mobile",
-        brandId :["BM1","BM2","BM3","BM4","BM5","BM6","BM7"]
+        brandId :["63356b4762e43d36e9311101" , "63356b0d62e43d36e93110fe", "63356adb62e43d36e93110fb","63356c3402129fe304643d2c","63356c8502129fe304643d2f","63356cf302129fe304643d32","63356d3502129fe304643d35"] 
         
     }
 ]
