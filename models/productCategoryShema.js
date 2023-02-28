@@ -2,14 +2,13 @@ const mongoose = require('mongoose')
 const productCategorySchema = new mongoose.Schema({
   categoryName: {
     type: String,
-    required: true,
+    required: true
   },
-  skuId:{
-    type : String,
+  skuId: {
+    type: String
   }
 
-},{timestamps: true}
+}, { timestamps: true }
 )
 
-
-module.exports = mongoose.model('Category',productCategorySchema)
+module.exports = mongoose.model('Category', productCategorySchema)
